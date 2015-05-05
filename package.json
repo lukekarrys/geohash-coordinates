@@ -10,18 +10,18 @@
     "MD5": "^1.2.1",
     "async": "^0.9.0",
     "debug": "^2.1.3",
-    "djia": "^1.0.2",
-    "geo-graticule": "^1.1.0",
-    "hex-frac-dec-frac": "^1.0.0",
+    "djia": "^1.0.3",
+    "geo-graticule": "^1.1.1",
+    "hex-frac-dec-frac": "^1.0.1",
     "lodash": "^3.8.0",
     "moment": "^2.10.2"
   },
   "devDependencies": {
-    "babel": "^5.1.13",
+    "babel": "^5.2.15",
     "babel-tape-runner": "^1.1.0",
     "precommit-hook": "^2.0.1",
     "rimraf": "^2.3.3",
-    "standard": "^3.7.2",
+    "standard": "^3.7.3",
     "tap-spec": "^3.0.0",
     "tape": "^4.0.0"
   },
@@ -44,8 +44,14 @@
   },
   "scripts": {
     "compile": "babel src --out-dir lib",
-    "lint": "standard .",
+    "debug": "DEBUG=geohash-coordinates babel-tape-runner test/*.js",
+    "lint": "standard",
     "prepublish": "npm run compile",
-    "test": "babel-tape-runner test/*.js"
+    "test": "babel-tape-runner test/*.js | tap-spec"
+  },
+  "standard": {
+    "ignore": [
+      "**/lib/**"
+    ]
   }
 }
