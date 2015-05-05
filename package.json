@@ -1,6 +1,6 @@
 {
   "name": "geohash-coordinates",
-  "description": "Find out info about today's geohash for your graticule or globally.",
+  "description": "Find out info about today's geohash for a graticule or globally.",
   "version": "0.0.0",
   "author": "Luke Karrys",
   "bugs": {
