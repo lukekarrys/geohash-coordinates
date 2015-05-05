@@ -1,0 +1,50 @@
+{
+  "name": "geohash-coordinates",
+  "description": "Find out info about today's geohash for your graticule. Inspired by xkcd",
+  "version": "0.0.0",
+  "author": "Luke Karrys",
+  "bugs": {
+    "url": "https://github.com/lukekarrys/geohash-coordinates/issues"
+  },
+  "dependencies": {
+    "MD5": "^1.2.1",
+    "async": "^0.9.0",
+    "debug": "^2.1.3",
+    "djia": "^1.0.2",
+    "geo-graticule": "^1.1.0",
+    "hex-frac-dec-frac": "^1.0.0",
+    "lodash": "^3.8.0",
+    "moment": "^2.10.2"
+  },
+  "devDependencies": {
+    "babel": "^5.1.13",
+    "babel-tape-runner": "^1.1.0",
+    "precommit-hook": "^2.0.1",
+    "rimraf": "^2.3.3",
+    "standard": "^3.7.2",
+    "tap-spec": "^3.0.0",
+    "tape": "^4.0.0"
+  },
+  "homepage": "https://github.com/lukekarrys/geohash-coordinates",
+  "keywords": [
+    "coordinates",
+    "geo",
+    "geohash",
+    "xkcd"
+  ],
+  "license": "MIT",
+  "main": "lib/geohash.js",
+  "pre-commit": [
+    "lint"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lukekarrys/geohash-coordinates"
+  },
+  "scripts": {
+    "compile": "babel src --out-dir lib",
+    "lint": "standard",
+    "prepublish": "npm run compile",
+    "test": "babel-tape-runner test/*.js"
+  }
+}
