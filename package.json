@@ -1,6 +1,6 @@
 {
   "name": "geohash-coordinates",
-  "description": "Find out info about today's geohash for your graticule. Inspired by xkcd",
+  "description": "Find out info about today's geohash for your graticule or globally.",
   "version": "0.0.0",
   "author": "Luke Karrys",
   "bugs": {
@@ -43,7 +43,7 @@
   },
   "scripts": {
     "compile": "babel src --out-dir lib",
-    "lint": "standard",
+    "lint": "standard .",
     "prepublish": "npm run compile",
     "test": "babel-tape-runner test/*.js"
   }
