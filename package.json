@@ -33,7 +33,7 @@
     "xkcd"
   ],
   "license": "MIT",
-  "main": "lib/geohash.js",
+  "main": "lib/index.js",
   "pre-commit": [
     "lint",
     "test"
