@@ -71,3 +71,12 @@ test('Global hash', (t) => {
     })
   }, t.end)
 })
+
+test('Neighbors', (t) => {
+  const date = '2008-05-20'
+  neighbors({date, location: '68.5,-29.5', cache: CACHE_DIR}, (err, results) => {
+    t.equal(err, null, `${date} no error`)
+    t.equal(results.length, 9, `${date} has 9 results`)
+    t.end()
+  })
+})

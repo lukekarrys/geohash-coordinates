@@ -47,7 +47,7 @@ const locationWithDecimals = (options) => {
 // geocode within all the neighboring graticules for that location
 const neighborsWithDecimals = (options) => {
   const {date, location, decimals} = options
-  return new Geo(location).getNeighboringGraticules().map((row) => {
+  return new Geo(location).neighboringGraticules().map((row) => {
     return row.map((graticule) => {
       return locationWithDecimals({date, decimals, location: graticule})
     })
