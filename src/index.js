@@ -47,11 +47,11 @@ const locationWithDecimals = (options) => {
 // geocode within all the neighboring graticules for that location
 const neighborsWithDecimals = (options) => {
   const {date, location, decimals} = options
-  return new Geo(location).neighboringGraticules().map((row) => {
-    return row.map((graticule) => {
-      return locationWithDecimals({date, decimals, location: graticule})
-    })
-  })
+  const neighbors = new Geo(location).neighboringGraticules()
+
+  debug(`Neighbors with decimals: ${neighbors}`)
+
+  return neighbors.map((graticule) => locationWithDecimals({date, decimals, location: graticule}))
 }
 
 // Converts a date to the decimals for that date
