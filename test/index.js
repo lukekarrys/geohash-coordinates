@@ -5,6 +5,7 @@ import path from 'path'
 import {all, global, graticule, neighbors} from '../src/index'
 
 const fixed5 = (arr) => arr.map(Number).map((num) => num.toFixed(5))
+const fixed6 = (arr) => arr.map(Number).map((num) => num.toFixed(6))
 const CACHE_DIR = path.resolve(__dirname, '..')
 
 test('W30 logic works west of W30', (t) => {
@@ -90,4 +91,22 @@ test('Neighbors', (t) => {
     t.deepEqual(results, expected, `${date} has correct results`)
     t.end()
   })
+})
+
+test('From each quadrant', (t) => {
+  const date = '2015-05-06'
+  const locations = {
+    '34.5,113.5': [34.767055, 113.141584],
+    '-37.5,145.5': [-37.767055, 145.141584],
+    '-34.5,-58.5': [-34.874946, -58.043722],
+    '33.5,-111.5': [33.874946, -111.043722]
+  }
+
+  async.eachSeries(Object.keys(locations), (location, cb) => {
+    graticule({date, location, cache: CACHE_DIR}, (err, results) => {
+      t.equal(err, null, `${date} no error`)
+      t.deepEqual(fixed6(results), fixed6(locations[location]), `${date} results`)
+      cb()
+    })
+  }, t.end)
 })
