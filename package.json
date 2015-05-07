@@ -11,13 +11,13 @@
     "async": "^0.9.0",
     "debug": "^2.1.3",
     "djia": "^1.0.3",
-    "geo-graticule": "^2.0.0",
+    "geo-graticule": "^2.0.2",
     "hex-frac-dec-frac": "^1.0.1",
     "lodash": "^3.8.0",
     "moment": "^2.10.2"
   },
   "devDependencies": {
-    "babel": "^5.2.15",
+    "babel": "^5.2.16",
     "babel-tape-runner": "^1.1.0",
     "precommit-hook": "^2.0.1",
     "rimraf": "^2.3.3",
