@@ -2,7 +2,10 @@ import test from 'tape'
 import async from 'async'
 import path from 'path'
 
-import {all, global, graticule, neighbors} from '../src/index'
+import pluck from 'lodash/collection/pluck'
+import compact from 'lodash/array/compact'
+
+import {all, global, graticule, neighbors, latest} from '../src/index'
 
 const fixed5 = (arr) => arr.map(Number).map((num) => num.toFixed(5))
 const fixed6 = (arr) => arr.map(Number).map((num) => num.toFixed(6))
@@ -109,4 +112,23 @@ test('From each quadrant', (t) => {
       cb()
     })
   }, t.end)
+})
+
+test('Latest', (t) => {
+  const date = '2015-05-01'
+  const location = '34.5,113.5'
+
+  latest({
+    date,
+    location,
+    days: 5,
+    cache: CACHE_DIR,
+    getGlobal: false,
+    getNeighbors: false
+  }, (err, result) => {
+    t.equal(err, null)
+    t.equal(compact(pluck(result, 'graticule')).length, 5)
+    t.equal(result.length, 5)
+    t.end()
+  })
 })

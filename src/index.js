@@ -1,5 +1,5 @@
 import md5 from 'MD5'
-import async from 'async'
+import {parallel, mapSeries} from 'async'
 import debugThe from 'debug'
 import Geo from 'geo-graticule'
 import moment from 'moment'
@@ -9,7 +9,11 @@ import fetchDjia from 'djia'
 import assign from 'lodash/object/assign'
 import identity from 'lodash/utility/identity'
 import pick from 'lodash/object/pick'
+import omit from 'lodash/object/omit'
+import defaults from 'lodash/object/defaults'
 import partial from 'lodash/function/partial'
+import range from 'lodash/utility/range'
+import compact from 'lodash/array/compact'
 import {name} from '../package.json'
 
 // Debug based on the name of the module
@@ -24,6 +28,7 @@ const splitAt = (str, index) => [str.substring(0, index), str.substring(index)]
 // Formatting helpers for dates and dow jones values
 const formatDate = (date) => moment(date).format('YYYY-MM-DD')
 const getDayBefore = (date) => formatDate(moment(date).subtract({days: 1}))
+const getDaysAfter = (date, days) => formatDate(moment(date).add({days}))
 const formatDjia = (djia) => typeof djia === 'number' ? djia.toFixed(2) : djia
 
 // Helpers for determining if locations or dates trigger the w30 rule
@@ -85,9 +90,9 @@ const geohashCoordinates = ({
   date = '',
   location = '',
   cache = false,
-  _getGraticule = true,
-  _getGlobal = true,
-  _getNeighbors = true
+  getGraticule = true,
+  getGlobal = true,
+  getNeighbors = true
 } = {}, cb) => {
   const options = {cache, date: formatDate(date)}
 
@@ -98,10 +103,10 @@ const geohashCoordinates = ({
   // This function can be used to fetch any combination of global or graticule hashes
   // for a specific date. The global hash and some dates/location combos require
   // the east decimals. Everything else requires the west ones.
-  const fetchEast = _getGlobal || !location || (location && useW30({date, location}))
+  const fetchEast = getGlobal || !location || (location && useW30({date, location}))
   const fetchWest = location && !useW30({date, location})
 
-  async.parallel([
+  parallel([
     fetchEast ? eastDecimals : passThrough,
     fetchWest ? westDecimals : passThrough
   ], (err, results) => {
@@ -113,13 +118,13 @@ const geohashCoordinates = ({
     const decimals = {east, west}
 
     // If requested calculate the global hash
-    const globalLocation = _getGlobal && east && decimalsToGlobal(east)
+    const globalLocation = getGlobal && east && decimalsToGlobal(east)
 
     // If a location was passed in, attempt to calculate graticule/neighbors
     if (location) {
       const graticuleOptions = {date, location, decimals}
-      graticuleLocation = _getGraticule && locationWithDecimals(graticuleOptions)
-      graticuleNeighbors = _getNeighbors && neighborsWithDecimals(graticuleOptions)
+      graticuleLocation = getGraticule && locationWithDecimals(graticuleOptions)
+      graticuleNeighbors = getNeighbors && neighborsWithDecimals(graticuleOptions)
     }
 
     debug(`east: ${east}`)
@@ -142,10 +147,10 @@ const geohashCoordinates = ({
 // as a single return value, not an object
 const geohashCoordinatesFor = (option, options, cb) => {
   const defaultOptions = assign({
-    _getGlobal: false,
-    _getGraticule: false,
-    _getNeighbors: false
-  }, { ['_' + option]: true })
+    getGlobal: false,
+    getGraticule: false,
+    getNeighbors: false
+  }, { [option]: true })
 
   geohashCoordinates(assign({}, options, defaultOptions), (err, result) => {
     if (err) return cb(err)
@@ -153,8 +158,37 @@ const geohashCoordinatesFor = (option, options, cb) => {
   })
 }
 
+// Get the latest geohashes
+// Defaults to today and 4 days ahead but can be used to get any date
+// plus any number of future days
+const latest = (options, cb) => {
+  const optsWithDefaults = defaults(options, {
+    date: formatDate(),
+    days: 4
+  })
+  const {days, date: startDate} = optsWithDefaults
+  const dates = range(days).map((index) => getDaysAfter(startDate, index))
+
+  mapSeries(dates, (date, cb) => {
+    geohashCoordinates(assign({}, omit(options, 'days'), {date}), (err, result) => {
+      cb(err, assign({}, result, {date}))
+    })
+  }, (err, results) => {
+    // We are completing iterations up to a possible error which we are
+    // expecting in some cases, so we strip falsy values from results
+    // and treat 'data not available yet' as an ok error
+    const validResults = results && compact(results)
+    const okError = !err || err.message === 'data not available yet'
+
+    if (err && !okError) return cb(err)
+
+    cb(null, validResults)
+  })
+}
+
 export default {
   all: geohashCoordinates,
+  latest: latest,
   global: partial(geohashCoordinatesFor, 'getGlobal'),
   graticule: partial(geohashCoordinatesFor, 'getGraticule'),
   neighbors: partial(geohashCoordinatesFor, 'getNeighbors')

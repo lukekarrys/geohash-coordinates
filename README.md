@@ -40,6 +40,18 @@ geohash.all({
   console.log(result.graticule) // [ 34.380395695429435, -111.6951528305385 ]
   console.log(result.global)    // [ -42.426807304339135, -15.618631484260248 ]
 })
+
+geohash.latest({
+  date: '2015-05-05', // Defaults to today
+  days: 4 // Defaults to 4,
+  location: '34.123,-111.456'
+}, (err, results) => {
+    // Results will be an array of results from `geohash.all` up to any date
+    // that does not have Dow Jones opening data yet. So this is safe to call
+    // on any date for any number of future dates.
+    // It is designed so that by default it can be called on a Friday
+    // and it will return the weekend (and the possible Monday holiday).
+})
 ```
 
 
