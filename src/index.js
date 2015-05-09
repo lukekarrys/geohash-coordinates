@@ -64,9 +64,11 @@ const neighborsWithDecimals = (options) => {
 const toDecimals = (w30 = false, {
   date = '',
   cache = false,
+  __now = undefined
 } = {}, cb) => {
   fetchDjia({
     cache,
+    __now,
     date: w30 ? getDayBefore(date) : date
   }, (err, djia) => {
     if (err) return cb(err)
@@ -92,9 +94,10 @@ const geohashCoordinates = ({
   cache = false,
   getGraticule = true,
   getGlobal = true,
-  getNeighbors = true
+  getNeighbors = true,
+  __now = undefined
 } = {}, cb) => {
-  const options = {cache, date: formatDate(date)}
+  const options = {cache, date: formatDate(date), __now}
 
   // Partially applied helpers for getting the decimals east and west of w30
   const eastDecimals = partial(toDecimals, true, options)

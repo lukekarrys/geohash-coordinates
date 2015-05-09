@@ -10,7 +10,7 @@ import {all, global, graticule, neighbors, latest} from '../src/index'
 
 const fixed5 = (arr) => arr.map(Number).map((num) => num.toFixed(5))
 const fixed6 = (arr) => arr.map(Number).map((num) => num.toFixed(6))
-const CACHE_DIR = path.resolve(__dirname, '..')
+const cache = path.join(path.resolve(__dirname, '..'), 'djia_cache.json')
 
 test('W30 logic works west of W30', (t) => {
   // http://wiki.xkcd.com/geohashing/30W_Time_Zone_Rule
@@ -29,7 +29,7 @@ test('W30 logic works west of W30', (t) => {
   }
 
   async.eachSeries(Object.keys(data), (date, cb) => {
-    graticule({date, location: '68.5,-30.5', cache: CACHE_DIR}, (err, results) => {
+    graticule({date, location: '68.5,-30.5', cache}, (err, results) => {
       t.equal(err, null, `${date} no error`)
       t.deepEqual(fixed5(results), fixed5(data[date]), `${date} results`)
       cb()
@@ -54,7 +54,7 @@ test('W30 logic works east of W30', (t) => {
   }
 
   async.eachSeries(Object.keys(data), (date, cb) => {
-    graticule({date, location: '68.5,-29.5', cache: CACHE_DIR}, (err, results) => {
+    graticule({date, location: '68.5,-29.5', cache}, (err, results) => {
       t.equal(err, null, `${date} no error`)
       t.deepEqual(fixed5(results), fixed5(data[date]), `${date} results`)
       cb()
@@ -69,7 +69,7 @@ test('Global hash', (t) => {
   }
 
   async.eachSeries(Object.keys(data), (date, cb) => {
-    global({date, cache: CACHE_DIR}, (err, results) => {
+    global({date, cache}, (err, results) => {
       t.equal(err, null, `${date} no error`)
       t.deepEqual(results, data[date], `${date} results`)
       cb()
@@ -90,7 +90,7 @@ test('Neighbors', (t) => {
     [67.63099058539201, -29.618945982091276],
     [67.63099058539201, -30.618945982091276]
   ]
-  neighbors({date, location: '68.5,-29.5', cache: CACHE_DIR}, (err, results) => {
+  neighbors({date, location: '68.5,-29.5', cache}, (err, results) => {
     t.equal(err, null, `${date} no error`)
     t.deepEqual(results, expected, `${date} has correct results`)
     t.end()
@@ -107,7 +107,7 @@ test('From each quadrant', (t) => {
   }
 
   async.eachSeries(Object.keys(locations), (location, cb) => {
-    graticule({date, location, cache: CACHE_DIR}, (err, results) => {
+    graticule({date, location, cache}, (err, results) => {
       t.equal(err, null, `${date} no error`)
       t.deepEqual(fixed6(results), fixed6(locations[location]), `${date} results`)
       cb()
@@ -122,8 +122,8 @@ test('Latest', (t) => {
   latest({
     date,
     location,
+    cache,
     days: 5,
-    cache: CACHE_DIR,
     getGlobal: false,
     getNeighbors: false
   }, (err, result) => {
@@ -134,42 +134,44 @@ test('Latest', (t) => {
   })
 })
 
-// Due to the nature of the algorithm, these tests will only pass on a Friday
-// Keeping them around for later use, since they are helpful to test in those
-// cases
+test('Get 3 friday results in NW quadrant', (t) => {
+  const date = '2015-05-01'
+  const __now = date + 'T16:00:00-0400'
+  const location = '34.5,-113.5'
 
-// test('Get 3 friday results in NW quadrant', (t) => {
-//   const date = moment().day(5).format('YYYY-MM-DD')
-//   const location = '34.5,-113.5'
+  latest({
+    date,
+    __now,
+    location,
+    cache,
+    days: 5,
+    getGlobal: false,
+    getNeighbors: false
+  }, (err, result) => {
+    t.equal(err, null, 'no error')
+    t.equal(result.length, 3, '3 total results')
+    t.equal(compact(pluck(result, 'graticule')).length, 3, 'has 3 graticule results (fri/sat/sun)')
+    t.end()
+  })
+})
 
-//   latest({
-//     date,
-//     location,
-//     days: 5,
-//     cache: CACHE_DIR,
-//     getGlobal: false,
-//     getNeighbors: false
-//   }, (err, result) => {
-//     t.equal(err, null, 'no error')
-//     t.equal(compact(pluck(result, 'graticule')).length, 3, 'has 3 results (fri/sat/sun)')
-//     t.end()
-//   })
-// })
+test('Get 4 friday results in NE quadrant', (t) => {
+  const date = '2015-05-01'
+  const __now = date + 'T16:00:00-0400'
+  const location = '54.2,5.4'
 
-// test('Get 4 friday results in NE quadrant', (t) => {
-//   const date = moment().day(5).format('YYYY-MM-DD')
-//   const location = '54.2,5.4'
-
-//   latest({
-//     date,
-//     location,
-//     days: 5,
-//     cache: CACHE_DIR,
-//     getGlobal: false,
-//     getNeighbors: false
-//   }, (err, result) => {
-//     t.equal(err, null)
-//     t.equal(compact(pluck(result, 'graticule')).length, 4, 'has 3 results (fri/sat/sun/mon)')
-//     t.end()
-//   })
-// })
+  latest({
+    date,
+    __now,
+    location,
+    cache,
+    days: 5,
+    getGlobal: false,
+    getNeighbors: false
+  }, (err, result) => {
+    t.equal(err, null)
+    t.equal(result.length, 4, '4 total results')
+    t.equal(compact(pluck(result, 'graticule')).length, 4, 'has 4 graticule results (fri/sat/sun/mon)')
+    t.end()
+  })
+})
