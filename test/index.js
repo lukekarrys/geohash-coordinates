@@ -1,6 +1,7 @@
 import test from 'tape'
 import async from 'async'
 import path from 'path'
+import moment from 'moment'
 
 import pluck from 'lodash/collection/pluck'
 import compact from 'lodash/array/compact'
@@ -132,3 +133,43 @@ test('Latest', (t) => {
     t.end()
   })
 })
+
+// Due to the nature of the algorithm, these tests will only pass on a Friday
+// Keeping them around for later use, since they are helpful to test in those
+// cases
+
+// test('Get 3 friday results in NW quadrant', (t) => {
+//   const date = moment().day(5).format('YYYY-MM-DD')
+//   const location = '34.5,-113.5'
+
+//   latest({
+//     date,
+//     location,
+//     days: 5,
+//     cache: CACHE_DIR,
+//     getGlobal: false,
+//     getNeighbors: false
+//   }, (err, result) => {
+//     t.equal(err, null, 'no error')
+//     t.equal(compact(pluck(result, 'graticule')).length, 3, 'has 3 results (fri/sat/sun)')
+//     t.end()
+//   })
+// })
+
+// test('Get 4 friday results in NE quadrant', (t) => {
+//   const date = moment().day(5).format('YYYY-MM-DD')
+//   const location = '54.2,5.4'
+
+//   latest({
+//     date,
+//     location,
+//     days: 5,
+//     cache: CACHE_DIR,
+//     getGlobal: false,
+//     getNeighbors: false
+//   }, (err, result) => {
+//     t.equal(err, null)
+//     t.equal(compact(pluck(result, 'graticule')).length, 4, 'has 3 results (fri/sat/sun/mon)')
+//     t.end()
+//   })
+// })
