@@ -171,7 +171,7 @@ const latest = (options, cb) => {
 
   mapSeries(dates, (date, cb) => {
     geohashCoordinates(assign({}, omit(options, 'days'), {date}), (err, result) => {
-      cb(err, assign({}, result, {date}))
+      cb(err, result ? assign({}, result, {date}) : null)
     })
   }, (err, results) => {
     // We are completing iterations up to a possible error which we are
@@ -181,6 +181,7 @@ const latest = (options, cb) => {
     const okError = !err || err.message === 'data not available yet'
 
     if (err && !okError) return cb(err)
+    if (!validResults || !validResults.length) return cb(new Error('No results'))
 
     cb(null, validResults)
   })
