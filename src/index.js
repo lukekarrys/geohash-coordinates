@@ -1,4 +1,4 @@
-import md5 from 'MD5'
+import md5 from 'md5'
 import {parallel, mapSeries} from 'async'
 import debugThe from 'debug'
 import Geo from 'geo-graticule'
