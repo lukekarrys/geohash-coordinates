@@ -33,6 +33,9 @@
     "geohash",
     "xkcd"
   ],
+  "files": [
+    "lib/*"
+  ],
   "license": "MIT",
   "main": "lib/index.js",
   "pre-commit": [
