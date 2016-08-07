@@ -1,12 +1,11 @@
 import test from 'tape'
 import async from 'async'
 import path from 'path'
-import moment from 'moment'
 
-import pluck from 'lodash/collection/pluck'
-import compact from 'lodash/array/compact'
+import map from 'lodash/map'
+import compact from 'lodash/compact'
 
-import {all, global, graticule, neighbors, latest} from '../src/index'
+import {global, graticule, neighbors, latest} from '../src/index'
 
 const fixed5 = (arr) => arr.map(Number).map((num) => num.toFixed(5))
 const fixed6 = (arr) => arr.map(Number).map((num) => num.toFixed(6))
@@ -128,7 +127,7 @@ test('Latest', (t) => {
     getNeighbors: false
   }, (err, result) => {
     t.equal(err, null)
-    t.equal(compact(pluck(result, 'graticule')).length, 5)
+    t.equal(compact(map(result, 'graticule')).length, 5)
     t.equal(result.length, 5)
     t.end()
   })
@@ -150,7 +149,7 @@ test('Get 3 friday results in NW quadrant', (t) => {
   }, (err, result) => {
     t.equal(err, null, 'no error')
     t.equal(result.length, 3, '3 total results')
-    t.equal(compact(pluck(result, 'graticule')).length, 3, 'has 3 graticule results (fri/sat/sun)')
+    t.equal(compact(map(result, 'graticule')).length, 3, 'has 3 graticule results (fri/sat/sun)')
     t.end()
   })
 })
@@ -171,7 +170,7 @@ test('Get 4 friday results in NE quadrant', (t) => {
   }, (err, result) => {
     t.equal(err, null)
     t.equal(result.length, 4, '4 total results')
-    t.equal(compact(pluck(result, 'graticule')).length, 4, 'has 4 graticule results (fri/sat/sun/mon)')
+    t.equal(compact(map(result, 'graticule')).length, 4, 'has 4 graticule results (fri/sat/sun/mon)')
     t.end()
   })
 })

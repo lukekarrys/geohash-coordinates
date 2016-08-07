@@ -1,19 +1,20 @@
 import md5 from 'md5'
-import {parallel, mapSeries} from 'async'
+import parallel from 'async/parallel'
+import mapSeries from 'async/mapSeries'
 import debugThe from 'debug'
 import Geo from 'geo-graticule'
 import moment from 'moment'
 import hexToDec from 'hex-frac-dec-frac'
 import fetchDjia from 'djia'
 
-import assign from 'lodash/object/assign'
-import identity from 'lodash/utility/identity'
-import pick from 'lodash/object/pick'
-import omit from 'lodash/object/omit'
-import defaults from 'lodash/object/defaults'
-import partial from 'lodash/function/partial'
-import range from 'lodash/utility/range'
-import compact from 'lodash/array/compact'
+import assign from 'lodash/assign'
+import identity from 'lodash/identity'
+import pickBy from 'lodash/pickBy'
+import omit from 'lodash/omit'
+import defaults from 'lodash/defaults'
+import partial from 'lodash/partial'
+import range from 'lodash/range'
+import compact from 'lodash/compact'
 import {name} from '../package.json'
 
 // Debug based on the name of the module
@@ -137,8 +138,9 @@ const geohashCoordinates = ({
     debug(`neighbors: ${graticuleNeighbors}`)
 
     // Removes all falsy key/values from the return object
-    cb(null, pick({
-      west, east,
+    cb(null, pickBy({
+      west,
+      east,
       graticule: graticuleLocation,
       global: globalLocation,
       neighbors: graticuleNeighbors
@@ -190,10 +192,10 @@ const latest = (options, cb) => {
   })
 }
 
-export default {
-  all: geohashCoordinates,
-  latest: latest,
-  global: partial(geohashCoordinatesFor, 'getGlobal'),
-  graticule: partial(geohashCoordinatesFor, 'getGraticule'),
-  neighbors: partial(geohashCoordinatesFor, 'getNeighbors')
-}
+export default geohashCoordinates
+export {geohashCoordinates as all}
+export {latest as latest}
+
+export const global = partial(geohashCoordinatesFor, 'getGlobal')
+export const graticule = partial(geohashCoordinatesFor, 'getGraticule')
+export const neighbors = partial(geohashCoordinatesFor, 'getNeighbors')
