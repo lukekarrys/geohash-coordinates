@@ -26,15 +26,15 @@
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   },
+  "files": [
+    "lib/*"
+  ],
   "homepage": "https://github.com/lukekarrys/geohash-coordinates",
   "keywords": [
     "coordinates",
     "geo",
     "geohash",
     "xkcd"
-  ],
-  "files": [
-    "lib/*"
   ],
   "license": "MIT",
   "main": "lib/index.js",
