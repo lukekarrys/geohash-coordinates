@@ -166,7 +166,7 @@ const geohashCoordinatesFor = (option, options, cb) => {
 // Get the latest geohashes
 // Defaults to today and 4 days ahead but can be used to get any date
 // plus any number of future days
-const latest = (options, cb) => {
+export const latest = (options, cb) => {
   const optsWithDefaults = defaults(options, {
     date: formatDate(),
     days: 4
@@ -194,7 +194,6 @@ const latest = (options, cb) => {
 
 export default geohashCoordinates
 export {geohashCoordinates as all}
-export {latest as latest}
 
 export const global = partial(geohashCoordinatesFor, 'getGlobal')
 export const graticule = partial(geohashCoordinatesFor, 'getGraticule')
