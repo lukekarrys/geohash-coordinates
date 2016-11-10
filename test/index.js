@@ -1,15 +1,28 @@
 import test from 'tape'
 import async from 'async'
-import path from 'path'
+import nock from 'nock'
+import moment from 'moment'
+import Geo from 'geo-graticule'
 
 import map from 'lodash/map'
 import compact from 'lodash/compact'
 
 import {global, graticule, neighbors, latest} from '../src/index'
+import fixtures from './fixtures'
+
+const domain = 'http://geo.crox.net/djia'
+const mockDate = (date, surrounding = [0]) => {
+  surrounding.map(
+    (addDays) =>
+      moment(date).add(addDays, 'days').format('YYYY-MM-DD')
+  ).forEach(
+    (date) =>
+      nock(domain).get(`/${date}`).reply(200, fixtures[date])
+  )
+}
 
 const fixed5 = (arr) => arr.map(Number).map((num) => num.toFixed(5))
 const fixed6 = (arr) => arr.map(Number).map((num) => num.toFixed(6))
-const cache = path.join(path.resolve(__dirname, '..'), 'djia_cache.json')
 
 test('W30 logic works west of W30', (t) => {
   // http://wiki.xkcd.com/geohashing/30W_Time_Zone_Rule
@@ -28,8 +41,10 @@ test('W30 logic works west of W30', (t) => {
   }
 
   async.eachSeries(Object.keys(data), (date, cb) => {
-    graticule({date, location: '68.5,-30.5', cache}, (err, results) => {
+    mockDate(date)
+    graticule({date, location: '68.5,-30.5'}, (err, results) => {
       t.equal(err, null, `${date} no error`)
+      t.equal(nock.activeMocks().length, 0, 'no mocks left')
       t.deepEqual(fixed5(results), fixed5(data[date]), `${date} results`)
       cb()
     })
@@ -52,9 +67,13 @@ test('W30 logic works east of W30', (t) => {
     '2008-05-30': [68.32272, -29.70458]
   }
 
-  async.eachSeries(Object.keys(data), (date, cb) => {
-    graticule({date, location: '68.5,-29.5', cache}, (err, results) => {
+  const dates = Object.keys(data)
+
+  async.eachSeries(dates, (date, cb) => {
+    mockDate(date, date > '2008-05-26' ? [-1] : [0])
+    graticule({date, location: '68.5,-29.5'}, (err, results) => {
       t.equal(err, null, `${date} no error`)
+      t.equal(nock.activeMocks().length, 0, 'no mocks left')
       t.deepEqual(fixed5(results), fixed5(data[date]), `${date} results`)
       cb()
     })
@@ -68,8 +87,10 @@ test('Global hash', (t) => {
   }
 
   async.eachSeries(Object.keys(data), (date, cb) => {
-    global({date, cache}, (err, results) => {
+    mockDate(date, [-1])
+    global({date}, (err, results) => {
       t.equal(err, null, `${date} no error`)
+      t.equal(nock.activeMocks().length, 0, 'no mocks left')
       t.deepEqual(results, data[date], `${date} results`)
       cb()
     })
@@ -89,8 +110,11 @@ test('Neighbors', (t) => {
     [67.63099058539201, -29.618945982091276],
     [67.63099058539201, -30.618945982091276]
   ]
-  neighbors({date, location: '68.5,-29.5', cache}, (err, results) => {
+
+  mockDate(date)
+  neighbors({date, location: '68.5,-29.5'}, (err, results) => {
     t.equal(err, null, `${date} no error`)
+    t.equal(nock.activeMocks().length, 0, 'no mocks left')
     t.deepEqual(results, expected, `${date} has correct results`)
     t.end()
   })
@@ -106,8 +130,10 @@ test('From each quadrant', (t) => {
   }
 
   async.eachSeries(Object.keys(locations), (location, cb) => {
-    graticule({date, location, cache}, (err, results) => {
+    mockDate(date, new Geo(location).isW30() ? [-1] : [0])
+    graticule({date, location}, (err, results) => {
       t.equal(err, null, `${date} no error`)
+      t.equal(nock.activeMocks().length, 0, 'no mocks left')
       t.deepEqual(fixed6(results), fixed6(locations[location]), `${date} results`)
       cb()
     })
@@ -118,15 +144,18 @@ test('Latest', (t) => {
   const date = '2015-05-01'
   const location = '34.5,113.5'
 
+  // Starts with day before since is east of W30
+  mockDate(date, [-1, 0, 1, 2, 3])
+
   latest({
     date,
     location,
-    cache,
     days: 5,
     getGlobal: false,
     getNeighbors: false
   }, (err, result) => {
     t.equal(err, null)
+    t.equal(nock.activeMocks().length, 0, 'no mocks left')
     t.equal(compact(map(result, 'graticule')).length, 5)
     t.equal(result.length, 5)
     t.end()
@@ -138,16 +167,18 @@ test('Get 3 friday results in NW quadrant', (t) => {
   const __now = date + 'T16:00:00-0400'
   const location = '34.5,-113.5'
 
+  mockDate(date, [0, 1, 2])
+
   latest({
     date,
     __now,
     location,
-    cache,
     days: 5,
     getGlobal: false,
     getNeighbors: false
   }, (err, result) => {
     t.equal(err, null, 'no error')
+    t.equal(nock.activeMocks().length, 0, 'no mocks left')
     t.equal(result.length, 3, '3 total results')
     t.equal(compact(map(result, 'graticule')).length, 3, 'has 3 graticule results (fri/sat/sun)')
     t.end()
@@ -158,17 +189,21 @@ test('Get 4 friday results in NE quadrant', (t) => {
   const date = '2015-05-01'
   const __now = date + 'T16:00:00-0400'
   const location = '54.2,5.4'
+  const days = 5
+
+  // Mock day before since it will be requested because location is east of W30
+  mockDate(date, [-1, 0, 1, 2])
 
   latest({
     date,
     __now,
     location,
-    cache,
-    days: 5,
+    days,
     getGlobal: false,
     getNeighbors: false
   }, (err, result) => {
     t.equal(err, null)
+    t.equal(nock.activeMocks().length, 0, 'no mocks left')
     t.equal(result.length, 4, '4 total results')
     t.equal(compact(map(result, 'graticule')).length, 4, 'has 4 graticule results (fri/sat/sun/mon)')
     t.end()

@@ -17,13 +17,14 @@
     "moment": "^2.14.1"
   },
   "devDependencies": {
+    "@tap-format/spec": "^0.2.0",
     "babel-cli": "^6.5.2",
     "babel-preset-es2015": "^6.13.2",
     "babel-tape-runner": "^2.0.1",
     "git-validate": "^2.1.4",
+    "nock": "^9.0.2",
     "rimraf": "^2.5.4",
     "standard": "^8.0.0-beta.3",
-    "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   },
   "files": [
@@ -52,7 +53,7 @@
     "debug": "DEBUG=geohash-coordinates babel-tape-runner test/*.js",
     "lint": "standard",
     "prepublish": "npm run compile",
-    "test": "babel-tape-runner test/*.js | tap-spec",
+    "test": "babel-tape-runner test/*.js | tap-format-spec",
     "validate": "npm ls"
   },
   "standard": {

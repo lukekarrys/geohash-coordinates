@@ -174,6 +174,8 @@ export const latest = (options, cb) => {
   const {days, date: startDate} = optsWithDefaults
   const dates = range(days).map((index) => getDaysAfter(startDate, index))
 
+  debug(`dates: ${dates}`)
+
   mapSeries(dates, (date, cb) => {
     geohashCoordinates(assign({}, omit(options, 'days'), {date}), (err, result) => {
       cb(err, result ? assign({}, result, {date}) : null)
