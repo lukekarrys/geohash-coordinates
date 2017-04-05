@@ -7,7 +7,7 @@
     "url": "https://github.com/lukekarrys/geohash-coordinates/issues"
   },
   "dependencies": {
-    "async": "^2.0.1",
+    "async": "^2.1.0",
     "debug": "^2.2.0",
     "djia": "^1.2.3",
     "geo-graticule": "^2.0.4",
