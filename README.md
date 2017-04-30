@@ -1,6 +1,8 @@
 geohash-coordinates
 ===================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/lukekarrys/geohash-coordinates.svg)](https://greenkeeper.io/)
+
 Find the geohashing coordinates for a day and location.
 
 I use this for [xkcd Geohashing](https://xkcd.com/426/).
