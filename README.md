@@ -1,8 +1,6 @@
 geohash-coordinates
 ===================
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/lukekarrys/geohash-coordinates.svg)](https://greenkeeper.io/)
-
 Find the geohashing coordinates for a day and location.
 
 I use this for [xkcd Geohashing](https://xkcd.com/426/).
@@ -10,6 +8,7 @@ I use this for [xkcd Geohashing](https://xkcd.com/426/).
 [![NPM](https://nodei.co/npm/geohash-coordinates.png)](https://nodei.co/npm/geohash-coordinates/)
 [![Build Status](https://travis-ci.org/lukekarrys/geohash-coordinates.png?branch=master)](https://travis-ci.org/lukekarrys/geohash-coordinates)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
+[![Greenkeeper badge](https://badges.greenkeeper.io/lukekarrys/geohash-coordinates.svg)](https://greenkeeper.io/)
 
 
 ## Install
